@@ -17,6 +17,14 @@
 	transform: translate(616px);
 }
 
+.container:hover {
+	background: rgb(255 200 2 / 100%);
+}
+
+.container:active {
+	background: rgb(120 120 120 / 100%);
+}
+
 .arrow {
 	flex-shrink: 0;
 	width: 48px;
