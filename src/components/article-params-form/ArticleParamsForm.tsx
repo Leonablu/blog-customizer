@@ -1,9 +1,11 @@
 import { ArrowButton } from 'components/arrow-button';
 import { Button } from 'components/button';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
+import { useClose } from '../select/hooks/useClose';
 import { Select } from '../select';
 import { RadioGroup } from '../radio-group';
 import { Separator } from '../separator';
+import { Text } from '../text';
 import {
 	backgroundColors,
 	contentWidthArr,
@@ -15,6 +17,7 @@ import {
 
 import styles from './ArticleParamsForm.module.scss';
 import clsx from 'clsx';
+import { useEnterSubmit } from '../select/hooks/useEnterSubmit';
 
 type ArticleParamsFormProps = {
 	onApply: (params: typeof defaultArticleState) => void;
@@ -25,7 +28,7 @@ export const ArticleParamsForm = ({
 	onApply,
 	onReset,
 }: ArticleParamsFormProps) => {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [selectedFont, setSelectedFont] = useState(
 		defaultArticleState.fontFamilyOption
 	);
@@ -42,35 +45,27 @@ export const ArticleParamsForm = ({
 		defaultArticleState.contentWidth
 	);
 
-	const sidebarRef = useRef<HTMLDivElement>(null);
-	const buttonRef = useRef<HTMLDivElement>(null);
+	const formRef = useRef<HTMLElement>(null);
+	const placeholderRef = useRef<HTMLDivElement>(null);
 
 	const toggleForm = () => {
-		setIsOpen(!isOpen);
+		setIsMenuOpen(!isMenuOpen);
 	};
 
-	const handleClickOutside = (event: MouseEvent) => {
-		if (
-			sidebarRef.current &&
-			buttonRef.current &&
-			!sidebarRef.current.contains(event.target as Node) &&
-			!buttonRef.current.contains(event.target as Node)
-		) {
-			setIsOpen(false);
-		}
+	const closeMenu = () => {
+		setIsMenuOpen(false);
 	};
 
-	useEffect(() => {
-		if (isOpen) {
-			document.addEventListener('mousedown', handleClickOutside);
-		} else {
-			document.removeEventListener('mousedown', handleClickOutside);
-		}
+	useClose({
+		isOpen: isMenuOpen,
+		onClose: closeMenu,
+		rootRef: formRef,
+	});
 
-		return () => {
-			document.removeEventListener('mousedown', handleClickOutside);
-		};
-	}, [isOpen]);
+	useEnterSubmit({
+		placeholderRef,
+		onChange: setIsMenuOpen,
+	});
 
 	const handleReset = () => {
 		setSelectedFont(defaultArticleState.fontFamilyOption);
@@ -81,7 +76,8 @@ export const ArticleParamsForm = ({
 		onReset();
 	};
 
-	const handleApply = () => {
+	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
 		if (onApply) {
 			onApply({
 				fontFamilyOption: selectedFont,
@@ -91,21 +87,23 @@ export const ArticleParamsForm = ({
 				contentWidth: contentWidth,
 			});
 		}
-		setIsOpen(false);
+		setIsMenuOpen(false);
 	};
 
 	return (
 		<>
-			<div ref={buttonRef}>
-				<ArrowButton onClick={toggleForm} isOpen={isOpen} />
+			<div>
+				<ArrowButton onClick={toggleForm} isOpen={isMenuOpen} />
 			</div>
 			<aside
-				ref={sidebarRef}
+				ref={formRef}
 				className={clsx(styles.container, {
-					[styles.container_open]: isOpen,
+					[styles.container_open]: isMenuOpen,
 				})}>
-				<form className={styles.form}>
-					<p className={styles.title}>ЗАДАЙТЕ ПАРАМЕТРЫ</p>
+				<form className={styles.form} onSubmit={handleSubmit}>
+					<Text as='h2' size={31} weight={800} uppercase>
+						Задайте параметры
+					</Text>
 					<Select
 						selected={selectedFont}
 						onChange={setSelectedFont}
@@ -141,7 +139,7 @@ export const ArticleParamsForm = ({
 					/>
 					<div className={styles.bottomContainer}>
 						<Button title='Сбросить' type='reset' onClick={handleReset} />
-						<Button title='Применить' type='button' onClick={handleApply} />
+						<Button title='Применить' type='submit' />
 					</div>
 				</form>
 			</aside>

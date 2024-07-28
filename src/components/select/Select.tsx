@@ -7,7 +7,7 @@ import arrowDown from 'src/images/arrow-down.svg';
 import { Option } from './Option';
 import { isFontFamilyClass } from './helpers/isFontFamilyClass';
 import { useEnterSubmit } from './hooks/useEnterSubmit';
-import { useOutsideClickClose } from './hooks/useOutsideClickClose';
+import { useClose } from './hooks/useClose';
 
 import styles from './Select.module.scss';
 
@@ -26,11 +26,13 @@ export const Select = (props: SelectProps) => {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const placeholderRef = useRef<HTMLDivElement>(null);
 
-	useOutsideClickClose({
+	useClose({
 		isOpen,
 		rootRef,
-		onClose,
-		onChange: setIsOpen,
+		onClose: () => {
+			setIsOpen(false);
+			onClose?.();
+		},
 	});
 
 	useEnterSubmit({
@@ -42,6 +44,7 @@ export const Select = (props: SelectProps) => {
 		setIsOpen(false);
 		onChange?.(option);
 	};
+
 	const handlePlaceHolderClick: MouseEventHandler<HTMLDivElement> = () => {
 		setIsOpen((isOpen) => !isOpen);
 	};
