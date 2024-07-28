@@ -38,7 +38,7 @@ export const ArticleParamsForm = ({
 	const [backgroundColor, setBackgroundColor] = useState(
 		defaultArticleState.backgroundColor
 	);
-	const [contentWidth, setСontentWidth] = useState(
+	const [contentWidth, setContentWidth] = useState(
 		defaultArticleState.contentWidth
 	);
 
@@ -77,7 +77,7 @@ export const ArticleParamsForm = ({
 		setSelectedFontSize(defaultArticleState.fontSizeOption);
 		setSelectedFontColor(defaultArticleState.fontColor);
 		setBackgroundColor(defaultArticleState.backgroundColor);
-		setСontentWidth(defaultArticleState.contentWidth);
+		setContentWidth(defaultArticleState.contentWidth);
 		onReset();
 	};
 
@@ -135,7 +135,7 @@ export const ArticleParamsForm = ({
 					/>
 					<Select
 						selected={contentWidth}
-						onChange={setСontentWidth}
+						onChange={setContentWidth}
 						options={contentWidthArr}
 						title='Ширина контента'
 					/>
